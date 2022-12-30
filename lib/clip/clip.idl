@@ -5,7 +5,7 @@ interface PathsD {
 
 	[CObject, Internal="HLClip::addPolygonD"] void addPolygonD( double * coordinates, int vertCount );
 	[CObject, Internal="HLClip::addPolygonsD"] void addPolygonsD( double * coordinates, int *vertCount, int polyCount );
-	[CObject, Internal="HLClip::unionAll"] PathsD unionAll();
+	[CObject, Internal="HLClip::unionAll"] PathsD unionAll(bool fillHoles);
 	[Internal="size"] int numPolygons();
 	[CObject,Internal="HLClip::polygonCounts"] int polygonVertCounts( int *counts ); 
 	[CObject,Internal="HLClip::getAllCoordinates"] void getAllCoordinates( double *coordinates2D ); 

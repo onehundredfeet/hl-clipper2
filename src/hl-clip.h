@@ -24,10 +24,26 @@ public:
         }
     }
 
-    static PathsD * unionAll( PathsD *paths ) {
+    static PathsD * unionAll( PathsD *paths, bool fillHoles ) {
         auto *x = new PathsD();
 
-        *x = Union(*paths, FillRule::NonZero, 2); // centimeters
+        if (fillHoles) {
+            PolyTreeD result;
+            ClipperD clipper(2);
+            clipper.AddSubject(*paths);
+            clipper.Execute(ClipType::Union, FillRule::NonZero, result);
+
+            for (auto child = result.begin(); child != result.end(); child++) {
+                auto &c = *(child->get());
+
+                if (c.IsHole())
+                    continue;
+
+                x->push_back(c.Polygon());
+            }
+        } else {
+            *x = Union(*paths, FillRule::NonZero, 2); // centimeters        
+        }
         
         return x;
     }
@@ -53,6 +69,8 @@ public:
         }
 
     }
+
+
 
 };
 

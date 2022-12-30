@@ -1,9 +1,9 @@
 {
-    "name"         :  "hl-forge",
-    "url"          :  "https://github.com/onehundredfeet/hl-forge",
+    "name"         :  "hl-clipper2",
+    "url"          :  "https://github.com/onehundredfeet/hl-clipper2",
     "license"      :  "MIT",
     "tags"         :  [""],
-    "description"  :  "Quick assertions and traces with macros",
+    "description"  :  "Haxe library for the Clipper2 library",
     "version"      :  "0.1.0",
     "classPath"    :  "lib",
     "releasenote"  :  "Initial work",
