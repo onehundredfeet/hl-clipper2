@@ -23,6 +23,37 @@ public:
             p += vertCount[i] * 2;
         }
     }
+
+    static PathsD * unionAll( PathsD *paths ) {
+        auto *x = new PathsD();
+
+        *x = Union(*paths, FillRule::NonZero, 2); // centimeters
+        
+        return x;
+    }
+
+    static int polygonCounts(PathsD *paths, int *counts) {
+        auto count = 0;
+        for (int i = 0; i < paths->size(); i++) {
+            auto x = (*paths)[i].size();
+            counts[i] = x;
+            count += x;
+        }
+
+        return count;
+    }
+    static void getAllCoordinates(PathsD *paths, double *counts) {
+        auto count = 0;
+        for (int i = 0; i < paths->size(); i++) {
+            auto &x = (*paths)[i];
+            for (int j = 0; j < x.size(); j++) {
+                counts[count++] = x[j].x;
+                counts[count++] = x[j].y;
+            }
+        }
+
+    }
+
 };
 
 #endif
