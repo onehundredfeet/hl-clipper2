@@ -1,0 +1,6 @@
+--class-path lib
+--class-path tests
+--hl bin/test.hl
+--main Test
+--library hx3compat
+--library hl-idl

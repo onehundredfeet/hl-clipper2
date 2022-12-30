@@ -41,6 +41,7 @@ cmake_policy(SET CMP0015 NEW)
 target_include_directories(clip.hdll
 PRIVATE
 ${HL_INCLUDE_DIR}
+"ext/Clipper2/CPP/Clipper2Lib/include"
 )
 
 
