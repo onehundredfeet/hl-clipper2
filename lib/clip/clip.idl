@@ -11,3 +11,30 @@ interface PathsD {
 	[CObject,Internal="HLClip::getAllCoordinates"] void getAllCoordinates( double *coordinates2D ); 
 };
 
+
+[Internal="PartitionPolyIt"]
+interface PartitionPolyIt {
+
+	[Internal="GetNumPoints"] int getNumPoints();
+	[Internal="GetPoints"] void getPoints(double *points);
+	[Internal="IsValid"]  bool isValid();
+	[Internal="Next"]  bool next();
+};
+
+
+[Internal="TPPLPolyList"] 
+interface PartitionPolyList {
+	void PartitionPolyList();
+	[CObject, Internal="HLPartition::NumPolys"] int numPolys(  );
+	[CObject, Internal="HLPartition::GetPolyIt"] PartitionPolyIt getPolyIt();
+};
+
+
+[Internal="TPPLPoly"] 
+interface PartitionPoly {
+	void PartitionPoly();
+	[CObject, Internal="HLPartition::InitD"] void initD( double *coordinates, int vertCount);
+	[CObject, Internal="HLPartition::ConvexPartitionOptimal"] void convexPartitionOptimal( PartitionPolyList result );
+};
+// need to add https://github.com/ivanfratric/polypartition
+

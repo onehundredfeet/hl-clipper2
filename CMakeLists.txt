@@ -25,7 +25,7 @@ src/clipper2.cpp
 "ext/Clipper2/CPP/Clipper2Lib/src/clipper.engine.cpp"
 "ext/Clipper2/CPP/Clipper2Lib/src/clipper.offset.cpp"
 "ext/Clipper2/CPP/Clipper2Lib/src/clipper.rectclip.cpp"
-
+"ext/polypartition/src/polypartition.cpp"
 )
 
 #set_source_files_properties(${FORGE_RENDERER_SRCS} ${FORGE_MW_SRCS} ${FORGE_OS_SRCS} src/forge.cpp src/hl-forge.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
@@ -46,6 +46,7 @@ target_include_directories(clip.hdll
 PRIVATE
 ${HL_INCLUDE_DIR}
 "ext/Clipper2/CPP/Clipper2Lib/include"
+"ext/polypartition/src"
 )
 
 

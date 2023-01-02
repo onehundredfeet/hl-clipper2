@@ -3,6 +3,7 @@
 #pragma once
 
 #include <clipper2/clipper.h>
+#include <polypartition.h>
 using namespace Clipper2Lib;
 
 class HLClip {
@@ -73,5 +74,73 @@ public:
 
 
 };
+
+struct PartitionPolyIt {
+    public:
+    PartitionPolyIt(TPPLPolyList *list) {
+        this->list = list;
+        it = list->begin();
+    }
+    
+    TPPLPolyList::iterator it;
+    TPPLPolyList *list;
+    inline bool IsValid() {
+        return it != list->end();
+    }
+    inline bool Next() {
+        it++;
+        return it != list->end();
+    }
+    inline TPPLPoly &Get() {
+        return *it;
+    }
+
+      inline int GetNumPoints() {
+        return Get().GetNumPoints();
+    }
+
+      inline void GetPoints( double *points) {
+        auto &poly = Get();
+        auto count =  poly.GetNumPoints();
+        for (int i = 0; i < count; i++) {
+            auto &pt = poly.GetPoint(i);
+            points[i * 2] = pt.x;
+            points[i * 2 + 1] = pt.y;
+        }
+    }
+};
+
+
+class HLPartition {
+public:
+    static inline void InitD(TPPLPoly *poly, double *coordinates, int vertCount) {
+       poly->Init(vertCount);
+        for (int i = 0; i < vertCount; i++) {
+            TPPLPoint &pt = poly->GetPoint(i);
+            pt.x = coordinates[i * 2];
+            pt.y = coordinates[i * 2 + 1];
+        }
+    }
+
+    static inline bool ConvexPartitionOptimal(TPPLPoly *poly, TPPLPolyList *result) {
+          TPPLPartition pp;
+
+        return pp.ConvexPartition_OPT(poly, result) != 0;
+
+    }
+
+    static inline int NumPolys(TPPLPolyList *list) {
+        return list->size();
+    }
+
+
+    static inline PartitionPolyIt *GetPolyIt(TPPLPolyList *list) {
+        auto *x = new PartitionPolyIt (list);
+        return x;
+    }
+
+
+};
+
 
 #endif

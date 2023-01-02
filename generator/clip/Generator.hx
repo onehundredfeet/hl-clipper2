@@ -13,6 +13,8 @@ class Generator {
 
 
 #include \"hl-clip.h\"
+#include \"polypartition.h\"
+
 ";
 	
 	public static function generateCpp() {	

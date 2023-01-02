@@ -79,7 +79,7 @@ class TestSuite extends haxe.unit.TestCase {
 
         x.addPolygonsD(Bytes.getArray(coords),Bytes.getArray(counts), 2 );
 
-        var y = x.unionAll();
+        var y = x.unionAll(true);
 
         //write test
         assertEquals(1, y.numPolygons());
@@ -102,6 +102,60 @@ class TestSuite extends haxe.unit.TestCase {
             trace(' x ${unionCoords[i*2]} y ${unionCoords[i*2+1]}');
         }
     }
+
+    public function testPartition() {
+        var x = new PathsD();
+        var coords = new Array<Float>();
+        coords.push(0.0);
+        coords.push(0.0);
+        coords.push(1.0);
+        coords.push(0.0);
+        coords.push(1.0);
+        coords.push(1.0);
+
+        coords.push(0.0);
+        coords.push(0.0);
+        coords.push(1.0);
+        coords.push(1.0);
+        coords.push(0.0);
+        coords.push(1.0);
+        
+        var counts = new Array<Int>();
+        counts.push(3);
+        counts.push(3);
+
+        x.addPolygonsD(Bytes.getArray(coords),Bytes.getArray(counts), 2 );
+
+        var y = x.unionAll(true);
+
+        //write test
+        assertEquals(1, y.numPolygons());
+
+        var counts = new Array<Int>();
+        counts.resize( y.numPolygons() );
+        var totalCount = y.polygonVertCounts(Bytes.getArray(counts));
+
+
+        assertEquals(4, totalCount);
+        assertEquals(4, counts[0]);
+
+        var unionCoords = new Array<Float>();
+        unionCoords.resize( totalCount * 2 );
+        y.getAllCoordinates( Bytes.getArray(unionCoords) );
+
+        var floatPtr : hl.BytesAccess<Float> = Bytes.getArray(unionCoords);
+
+        var partPoly = new PartitionPoly();
+        var partitions = new PartitionPolyList();
+        partPoly.initD(floatPtr, counts[0] );
+        partPoly.convexPartitionOptimal(partitions);
+
+        var numPartitions = partitions.numPolys();
+        assertEquals(1, numPartitions);
+
+      
+    }
+
 }
 
 class Test {
