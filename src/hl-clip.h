@@ -49,6 +49,16 @@ public:
         return x;
     }
 
+    static PolyTreeD * unionAllAsTree( PathsD *paths ) {
+        auto *result = new PolyTreeD();
+        ClipperD clipper(2);
+        clipper.AddSubject(*paths);
+        clipper.Execute(ClipType::Union, FillRule::NonZero, *result);
+
+        return result;
+    }
+    
+
     static int polygonCounts(PathsD *paths, int *counts) {
         auto count = 0;
         for (int i = 0; i < paths->size(); i++) {
@@ -71,7 +81,23 @@ public:
 
     }
 
+    static void PathD_getPoint(PathD *path, int idx, double *pt) {
+        auto &p = (*path)[idx];
+        pt[0] = p.x;
+        pt[1] = p.y;
+    }
 
+	static int PolyTreeD_numChildren(PolyTreeD *tree) {
+        return tree->Count();
+    }
+
+    static PolyTreeD *PolyTreeD_getChild(PolyTreeD *tree, int idx) {
+        return (*tree)[idx];
+    }
+
+    static const PathD *PolyTreeD_getPath(PolyTreeD *tree) {
+        return &tree->Polygon();
+    }
 
 };
 

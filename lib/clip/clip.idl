@@ -1,4 +1,15 @@
+interface PathD {
+	[Internal="size"] int numPoints();
+	[CObject,Internal="HLClip::PathD_getPoint"] void getPoint(int idx, double *coordinates2D);
+};
 
+[Internal="PolyTreeD"]
+interface PathTreeD {
+	[Internal="Count"] int numChildren();
+	[CObject,Internal="HLClip::PolyTreeD_getPath",Const] PathD getPath();
+	[CObject,Internal="HLClip::PolyTreeD_getChild",Const] PathTreeD getChild(int idx);
+	
+};
 
 interface PathsD {
 	void PathsD();
@@ -6,6 +17,7 @@ interface PathsD {
 	[CObject, Internal="HLClip::addPolygonD"] void addPolygonD( double * coordinates, int vertCount );
 	[CObject, Internal="HLClip::addPolygonsD"] void addPolygonsD( double * coordinates, int *vertCount, int polyCount );
 	[CObject, Internal="HLClip::unionAll"] PathsD unionAll(bool fillHoles);
+	[CObject, Internal="HLClip::unionAllAsTree"] PathTreeD unionAllAsTree();
 	[Internal="size"] int numPolygons();
 	[CObject,Internal="HLClip::polygonCounts"] int polygonVertCounts( int *counts ); 
 	[CObject,Internal="HLClip::getAllCoordinates"] void getAllCoordinates( double *coordinates2D ); 
