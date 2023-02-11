@@ -1,6 +1,7 @@
 interface PathD {
 	[Internal="size"] int numPoints();
 	[CObject,Internal="HLClip::PathD_getPoint"] void getPoint(int idx, double *coordinates2D);
+	[CObject,Internal="HLClip::PathD_getPoints"] void getPoints( double *coordinates2D);
 };
 
 [Internal="PolyTreeD"]
@@ -38,15 +39,23 @@ interface PartitionPolyIt {
 interface PartitionPolyList {
 	void PartitionPolyList();
 	[CObject, Internal="HLPartition::NumPolys"] int numPolys(  );
+	[CObject, Internal="HLPartition::PolyList_AddPoly",Const] PartitionPoly addPoly( int pointCount, double *coordinates  );
 	[CObject, Internal="HLPartition::GetPolyIt"] PartitionPolyIt getPolyIt();
+	[CObject, Internal="HLPartition::PolyList_RemoveHoles"] bool removeHoles( PartitionPolyList result );
+	[CObject, Internal="HLPartition::PolyList_ConvexPartition"] bool convexPartition( PartitionPolyList result );
 };
 
 
 [Internal="TPPLPoly"] 
 interface PartitionPoly {
 	void PartitionPoly();
+	[ Internal="SetHole"] void setHole( bool hole);
+	[ Internal="IsHole"] bool isHole( );
+
 	[CObject, Internal="HLPartition::InitD"] void initD( double *coordinates, int vertCount);
 	[CObject, Internal="HLPartition::ConvexPartitionOptimal"] void convexPartitionOptimal( PartitionPolyList result );
 };
+
+
 // need to add https://github.com/ivanfratric/polypartition
 

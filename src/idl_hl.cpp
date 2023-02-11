@@ -305,6 +305,11 @@ HL_PRIM void HL_NAME(PathD_getPoint2)(pref<PathD>* _this, int idx, vbyte* coordi
 }
 DEFINE_PRIM(_VOID, PathD_getPoint2, _IDL _I32 _BYTES);
 
+HL_PRIM void HL_NAME(PathD_getPoints1)(pref<PathD>* _this, vbyte* coordinates2D) {
+	(HLClip::PathD_getPoints( _unref(_this) , (double*)coordinates2D));
+}
+DEFINE_PRIM(_VOID, PathD_getPoints1, _IDL _BYTES);
+
 HL_PRIM int HL_NAME(PathTreeD_numChildren0)(pref<PolyTreeD>* _this) {
 	return (_unref(_this)->Count());
 }
@@ -390,15 +395,40 @@ HL_PRIM int HL_NAME(PartitionPolyList_numPolys0)(pref<TPPLPolyList>* _this) {
 }
 DEFINE_PRIM(_I32, PartitionPolyList_numPolys0, _IDL);
 
+HL_PRIM HL_CONST pref<TPPLPoly>* HL_NAME(PartitionPolyList_addPoly2)(pref<TPPLPolyList>* _this, int pointCount, vbyte* coordinates) {
+	return alloc_ref_const((HLPartition::PolyList_AddPoly( _unref(_this) , pointCount, (double*)coordinates)),PartitionPoly);
+}
+DEFINE_PRIM(_IDL, PartitionPolyList_addPoly2, _IDL _I32 _BYTES);
+
 HL_PRIM pref<PartitionPolyIt>* HL_NAME(PartitionPolyList_getPolyIt0)(pref<TPPLPolyList>* _this) {
 	return alloc_ref((HLPartition::GetPolyIt( _unref(_this) )),PartitionPolyIt);
 }
 DEFINE_PRIM(_IDL, PartitionPolyList_getPolyIt0, _IDL);
 
+HL_PRIM bool HL_NAME(PartitionPolyList_removeHoles1)(pref<TPPLPolyList>* _this, pref<TPPLPolyList>* result) {
+	return (HLPartition::PolyList_RemoveHoles( _unref(_this) , _unref_ptr_safe(result)));
+}
+DEFINE_PRIM(_BOOL, PartitionPolyList_removeHoles1, _IDL _IDL);
+
+HL_PRIM bool HL_NAME(PartitionPolyList_convexPartition1)(pref<TPPLPolyList>* _this, pref<TPPLPolyList>* result) {
+	return (HLPartition::PolyList_ConvexPartition( _unref(_this) , _unref_ptr_safe(result)));
+}
+DEFINE_PRIM(_BOOL, PartitionPolyList_convexPartition1, _IDL _IDL);
+
 HL_PRIM pref<TPPLPoly>* HL_NAME(PartitionPoly_new0)() {
 	return alloc_ref((new TPPLPoly()),PartitionPoly);
 }
 DEFINE_PRIM(_IDL, PartitionPoly_new0,);
+
+HL_PRIM void HL_NAME(PartitionPoly_setHole1)(pref<TPPLPoly>* _this, bool hole) {
+	(_unref(_this)->SetHole(hole));
+}
+DEFINE_PRIM(_VOID, PartitionPoly_setHole1, _IDL _BOOL);
+
+HL_PRIM bool HL_NAME(PartitionPoly_isHole0)(pref<TPPLPoly>* _this) {
+	return (_unref(_this)->IsHole());
+}
+DEFINE_PRIM(_BOOL, PartitionPoly_isHole0, _IDL);
 
 HL_PRIM void HL_NAME(PartitionPoly_initD2)(pref<TPPLPoly>* _this, vbyte* coordinates, int vertCount) {
 	(HLPartition::InitD( _unref(_this) , (double*)coordinates, vertCount));

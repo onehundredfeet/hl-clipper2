@@ -87,6 +87,10 @@ public:
         pt[1] = p.y;
     }
 
+    static void PathD_getPoints(PathD *path,double *pt) {
+        memcpy( pt, path->data(), path->size() * sizeof(PointD) );
+    }
+
 	static int PolyTreeD_numChildren(PolyTreeD *tree) {
         return tree->Count();
     }
@@ -154,6 +158,33 @@ public:
         return pp.ConvexPartition_OPT(poly, result) != 0;
 
     }
+
+
+    static inline bool PolyList_RemoveHoles(TPPLPolyList *polys, TPPLPolyList *result) {
+          TPPLPartition pp;
+        return pp.RemoveHoles(polys, result) != 0;
+    }
+
+    static inline bool PolyList_ConvexPartition(TPPLPolyList *polys, TPPLPolyList *result) {
+          TPPLPartition pp;
+
+        return pp.ConvexPartition_HM(polys, result) != 0;
+    }
+
+    static inline TPPLPoly *PolyList_AddPoly(TPPLPolyList *polys, int vertCount, double *coordinates) {
+        TPPLPoly poly;
+        poly.Init(vertCount);
+        for (int i = 0; i < vertCount; i++) {
+            TPPLPoint &pt = poly.GetPoint(i);
+            pt.x = coordinates[i * 2];
+            pt.y = coordinates[i * 2 + 1];
+        }
+        polys->push_back(poly);
+        auto &p = polys->back();
+        return &p;
+    }
+
+
 
     static inline int NumPolys(TPPLPolyList *list) {
         return list->size();
