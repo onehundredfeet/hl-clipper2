@@ -1,3 +1,20 @@
+//enum class JoinType { Square, Round, Miter };
+//enum class EndType {Polygon, Joined, Butt, Square, Round};
+
+enum JoinType {
+	"JoinType::Square",
+	"JoinType::Round",
+	"JoinType::Miter"
+};
+
+enum EndType {
+	"EndType::Polygon",
+	"EndType::Joined",
+	"EndType::Butt",
+	"EndType::Square",
+	"EndType::Round"
+};
+
 interface PathD {
 	[Internal="size"] int numPoints();
 	[CObject,Internal="HLClip::PathD_getPoint"] void getPoint(int idx, double *coordinates2D);
@@ -22,6 +39,9 @@ interface PathsD {
 	[Internal="size"] int numPolygons();
 	[CObject,Internal="HLClip::polygonCounts"] int polygonVertCounts( int *counts ); 
 	[CObject,Internal="HLClip::getAllCoordinates"] void getAllCoordinates( double *coordinates2D ); 
+
+	[CObject, Internal="HLClip::polyList_inflate"] PathsD inflate( double delta, JoinType jointype, EndType endtype, double miter_limit, int precision);
+
 };
 
 
@@ -32,12 +52,14 @@ interface PartitionPolyIt {
 	[Internal="GetPoints"] void getPoints(double *points);
 	[Internal="IsValid"]  bool isValid();
 	[Internal="Next"]  bool next();
+	[Const, Internal="Ptr"] PartitionPoly getPoly();
 };
 
 
 [Internal="TPPLPolyList"] 
 interface PartitionPolyList {
 	void PartitionPolyList();
+	void clear();
 	[CObject, Internal="HLPartition::NumPolys"] int numPolys(  );
 	[CObject, Internal="HLPartition::PolyList_AddPoly",Const] PartitionPoly addPoly( int pointCount, double *coordinates  );
 	[CObject, Internal="HLPartition::GetPolyIt"] PartitionPolyIt getPolyIt();
@@ -51,9 +73,12 @@ interface PartitionPoly {
 	void PartitionPoly();
 	[ Internal="SetHole"] void setHole( bool hole);
 	[ Internal="IsHole"] bool isHole( );
+	[Internal="GetNumPoints"] int getNumPoints();
+	[CObject,Internal="HLPartition::Poly_GetPoints"] void getPoints(double *points);
 
 	[CObject, Internal="HLPartition::InitD"] void initD( double *coordinates, int vertCount);
 	[CObject, Internal="HLPartition::ConvexPartitionOptimal"] void convexPartitionOptimal( PartitionPolyList result );
+	[CObject, Internal="HLPartition::TriangulateOptimal"] bool triangulateOptimal( PartitionPolyList result );
 };
 
 

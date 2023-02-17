@@ -54,6 +54,21 @@ HL_PRIM vstring * HL_NAME(getdllversion)(vstring * haxeversion) {
 	return haxeversion;
 }
 DEFINE_PRIM(_STRING, getdllversion, _STRING);
+
+class HNativeBuffer {
+    unsigned char *_ptr;
+    int _size;
+
+   public:
+   inline unsigned char * ptr() { return _ptr; }
+   inline int size() { return _size; }
+   HNativeBuffer(unsigned char *ptr, int size) : _ptr(ptr), _size(size) {}
+   HNativeBuffer(int size) : _ptr(new unsigned char[size]), _size(size) {}
+    ~HNativeBuffer() {
+        if (_ptr != nullptr)
+            delete [] _ptr;
+    }
+};
 template <typename T> struct pref {
 	void (*finalize)( pref<T> * );
 	T *value;
@@ -80,7 +95,7 @@ template<typename T> void free_ref( pref<T> *r, void (*deleteFunc)(T*) ) {
 	r->finalize = NULL;
 }
 
-inline void testvector(_hl_float3 *v) {
+inline void testvector(_h_float3 *v) {
   printf("v: %f %f %f\n", v->x, v->y, v->z);
 }
 template<typename T> pref<T> *_alloc_ref( T *value, void (*finalize)( pref<T> * ) ) {
@@ -258,6 +273,7 @@ inline static void _idc_copy_array( varray *dst, double *src,  int count) {
 
 #include "hl-clip.h"
 #include "polypartition.h"
+using namespace Clipper2Lib;
 
 
 
@@ -265,6 +281,44 @@ inline static void _idc_copy_array( varray *dst, double *src,  int count) {
 
 extern "C" {
 
+static JoinType JoinType__values[] = { JoinType::Square,JoinType::Round,JoinType::Miter };
+HL_PRIM int HL_NAME(JoinType_toValue0)( int idx ) {
+	return (int)JoinType__values[idx];
+}
+DEFINE_PRIM(_I32, JoinType_toValue0, _I32);
+HL_PRIM int HL_NAME(JoinType_indexToValue1)( int idx ) {
+	return (int)JoinType__values[idx];
+}
+DEFINE_PRIM(_I32, JoinType_indexToValue1, _I32);
+HL_PRIM int HL_NAME(JoinType_valueToIndex1)( int value ) {
+	for( int i = 0; i < 3; i++ ) if ( value == (int)JoinType__values[i]) return i; return -1;
+}
+DEFINE_PRIM(_I32, JoinType_valueToIndex1, _I32);
+HL_PRIM int HL_NAME(JoinType_fromValue1)( int value ) {
+	for( int i = 0; i < 3; i++ ) if ( value == (int)JoinType__values[i]) return i; return -1;
+}
+DEFINE_PRIM(_I32, JoinType_fromValue1, _I32);
+HL_PRIM int HL_NAME(JoinType_fromIndex1)( int index ) {return index;}
+DEFINE_PRIM(_I32, JoinType_fromIndex1, _I32);
+static EndType EndType__values[] = { EndType::Polygon,EndType::Joined,EndType::Butt,EndType::Square,EndType::Round };
+HL_PRIM int HL_NAME(EndType_toValue0)( int idx ) {
+	return (int)EndType__values[idx];
+}
+DEFINE_PRIM(_I32, EndType_toValue0, _I32);
+HL_PRIM int HL_NAME(EndType_indexToValue1)( int idx ) {
+	return (int)EndType__values[idx];
+}
+DEFINE_PRIM(_I32, EndType_indexToValue1, _I32);
+HL_PRIM int HL_NAME(EndType_valueToIndex1)( int value ) {
+	for( int i = 0; i < 5; i++ ) if ( value == (int)EndType__values[i]) return i; return -1;
+}
+DEFINE_PRIM(_I32, EndType_valueToIndex1, _I32);
+HL_PRIM int HL_NAME(EndType_fromValue1)( int value ) {
+	for( int i = 0; i < 5; i++ ) if ( value == (int)EndType__values[i]) return i; return -1;
+}
+DEFINE_PRIM(_I32, EndType_fromValue1, _I32);
+HL_PRIM int HL_NAME(EndType_fromIndex1)( int index ) {return index;}
+DEFINE_PRIM(_I32, EndType_fromIndex1, _I32);
 static void finalize_PathD( pref<PathD>* _this ) { free_ref(_this ); }
 HL_PRIM void HL_NAME(PathD_delete)( pref<PathD>* _this ) {
 	free_ref(_this );
@@ -365,6 +419,11 @@ HL_PRIM void HL_NAME(PathsD_getAllCoordinates1)(pref<PathsD>* _this, vbyte* coor
 }
 DEFINE_PRIM(_VOID, PathsD_getAllCoordinates1, _IDL _BYTES);
 
+HL_PRIM pref<PathsD>* HL_NAME(PathsD_inflate5)(pref<PathsD>* _this, double delta, int jointype, int endtype, double miter_limit, int precision) {
+	return alloc_ref((HLClip::polyList_inflate( _unref(_this) , delta, JoinType__values[jointype], EndType__values[endtype], miter_limit, precision)),PathsD);
+}
+DEFINE_PRIM(_IDL, PathsD_inflate5, _IDL _F64 _I32 _I32 _F64 _I32);
+
 HL_PRIM int HL_NAME(PartitionPolyIt_getNumPoints0)(pref<PartitionPolyIt>* _this) {
 	return (_unref(_this)->GetNumPoints());
 }
@@ -385,10 +444,20 @@ HL_PRIM bool HL_NAME(PartitionPolyIt_next0)(pref<PartitionPolyIt>* _this) {
 }
 DEFINE_PRIM(_BOOL, PartitionPolyIt_next0, _IDL);
 
+HL_PRIM HL_CONST pref<TPPLPoly>* HL_NAME(PartitionPolyIt_getPoly0)(pref<PartitionPolyIt>* _this) {
+	return alloc_ref_const((_unref(_this)->Ptr()),PartitionPoly);
+}
+DEFINE_PRIM(_IDL, PartitionPolyIt_getPoly0, _IDL);
+
 HL_PRIM pref<TPPLPolyList>* HL_NAME(PartitionPolyList_new0)() {
 	return alloc_ref((new TPPLPolyList()),PartitionPolyList);
 }
 DEFINE_PRIM(_IDL, PartitionPolyList_new0,);
+
+HL_PRIM void HL_NAME(PartitionPolyList_clear0)(pref<TPPLPolyList>* _this) {
+	(_unref(_this)->clear());
+}
+DEFINE_PRIM(_VOID, PartitionPolyList_clear0, _IDL);
 
 HL_PRIM int HL_NAME(PartitionPolyList_numPolys0)(pref<TPPLPolyList>* _this) {
 	return (HLPartition::NumPolys( _unref(_this) ));
@@ -430,6 +499,16 @@ HL_PRIM bool HL_NAME(PartitionPoly_isHole0)(pref<TPPLPoly>* _this) {
 }
 DEFINE_PRIM(_BOOL, PartitionPoly_isHole0, _IDL);
 
+HL_PRIM int HL_NAME(PartitionPoly_getNumPoints0)(pref<TPPLPoly>* _this) {
+	return (_unref(_this)->GetNumPoints());
+}
+DEFINE_PRIM(_I32, PartitionPoly_getNumPoints0, _IDL);
+
+HL_PRIM void HL_NAME(PartitionPoly_getPoints1)(pref<TPPLPoly>* _this, vbyte* points) {
+	(HLPartition::Poly_GetPoints( _unref(_this) , (double*)points));
+}
+DEFINE_PRIM(_VOID, PartitionPoly_getPoints1, _IDL _BYTES);
+
 HL_PRIM void HL_NAME(PartitionPoly_initD2)(pref<TPPLPoly>* _this, vbyte* coordinates, int vertCount) {
 	(HLPartition::InitD( _unref(_this) , (double*)coordinates, vertCount));
 }
@@ -439,5 +518,10 @@ HL_PRIM void HL_NAME(PartitionPoly_convexPartitionOptimal1)(pref<TPPLPoly>* _thi
 	(HLPartition::ConvexPartitionOptimal( _unref(_this) , _unref_ptr_safe(result)));
 }
 DEFINE_PRIM(_VOID, PartitionPoly_convexPartitionOptimal1, _IDL _IDL);
+
+HL_PRIM bool HL_NAME(PartitionPoly_triangulateOptimal1)(pref<TPPLPoly>* _this, pref<TPPLPolyList>* result) {
+	return (HLPartition::TriangulateOptimal( _unref(_this) , _unref_ptr_safe(result)));
+}
+DEFINE_PRIM(_BOOL, PartitionPoly_triangulateOptimal1, _IDL _IDL);
 
 }

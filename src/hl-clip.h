@@ -7,7 +7,7 @@
 using namespace Clipper2Lib;
 
 class HLClip {
-public:
+   public:
     static void addPolygonD(PathsD *paths, double *p, int vertCount) {
         PathD path;
         auto elemCount = vertCount * 2;
@@ -18,14 +18,14 @@ public:
         paths->push_back(path);
     }
 
-     static void addPolygonsD(PathsD *paths, double *p, int *vertCount, int polyCount) {
+    static void addPolygonsD(PathsD *paths, double *p, int *vertCount, int polyCount) {
         for (int i = 0; i < polyCount; i++) {
             addPolygonD(paths, p, vertCount[i]);
             p += vertCount[i] * 2;
         }
     }
 
-    static PathsD * unionAll( PathsD *paths, bool fillHoles ) {
+    static PathsD *unionAll(PathsD *paths, bool fillHoles) {
         auto *x = new PathsD();
 
         if (fillHoles) {
@@ -43,13 +43,17 @@ public:
                 x->push_back(c.Polygon());
             }
         } else {
-            *x = Union(*paths, FillRule::NonZero, 2); // centimeters        
+            *x = Union(*paths, FillRule::NonZero, 2);  // centimeters
         }
-        
+
         return x;
     }
-
-    static PolyTreeD * unionAllAsTree( PathsD *paths ) {
+    static PathsD *polyList_inflate(PathsD *polys, double delta, JoinType jointype, EndType endtype, double miter_limit, int precision) {
+        auto *x = new PathsD();
+        *x = InflatePaths(*polys, delta, jointype, endtype, miter_limit, precision);
+        return x;
+    }
+    static PolyTreeD *unionAllAsTree(PathsD *paths) {
         auto *result = new PolyTreeD();
         ClipperD clipper(2);
         clipper.AddSubject(*paths);
@@ -57,7 +61,6 @@ public:
 
         return result;
     }
-    
 
     static int polygonCounts(PathsD *paths, int *counts) {
         auto count = 0;
@@ -78,7 +81,6 @@ public:
                 counts[count++] = x[j].y;
             }
         }
-
     }
 
     static void PathD_getPoint(PathD *path, int idx, double *pt) {
@@ -87,11 +89,11 @@ public:
         pt[1] = p.y;
     }
 
-    static void PathD_getPoints(PathD *path,double *pt) {
-        memcpy( pt, path->data(), path->size() * sizeof(PointD) );
+    static void PathD_getPoints(PathD *path, double *pt) {
+        memcpy(pt, path->data(), path->size() * sizeof(PointD));
     }
 
-	static int PolyTreeD_numChildren(PolyTreeD *tree) {
+    static int PolyTreeD_numChildren(PolyTreeD *tree) {
         return tree->Count();
     }
 
@@ -102,16 +104,15 @@ public:
     static const PathD *PolyTreeD_getPath(PolyTreeD *tree) {
         return &tree->Polygon();
     }
-
 };
 
 struct PartitionPolyIt {
-    public:
+   public:
     PartitionPolyIt(TPPLPolyList *list) {
         this->list = list;
         it = list->begin();
     }
-    
+
     TPPLPolyList::iterator it;
     TPPLPolyList *list;
     inline bool IsValid() {
@@ -124,14 +125,16 @@ struct PartitionPolyIt {
     inline TPPLPoly &Get() {
         return *it;
     }
-
-      inline int GetNumPoints() {
+    inline TPPLPoly *Ptr() {
+        return &*it;
+    }
+    inline int GetNumPoints() {
         return Get().GetNumPoints();
     }
 
-      inline void GetPoints( double *points) {
+    inline void GetPoints(double *points) {
         auto &poly = Get();
-        auto count =  poly.GetNumPoints();
+        auto count = poly.GetNumPoints();
         for (int i = 0; i < count; i++) {
             auto &pt = poly.GetPoint(i);
             points[i * 2] = pt.x;
@@ -140,11 +143,18 @@ struct PartitionPolyIt {
     }
 };
 
-
 class HLPartition {
-public:
+   public:
+   static inline void  Poly_GetPoints(TPPLPoly *poly,double *points) {
+        auto count = poly->GetNumPoints();
+        for (int i = 0; i < count; i++) {
+            auto &pt = poly->GetPoint(i);
+            points[i * 2] = pt.x;
+            points[i * 2 + 1] = pt.y;
+        }
+   }
     static inline void InitD(TPPLPoly *poly, double *coordinates, int vertCount) {
-       poly->Init(vertCount);
+        poly->Init(vertCount);
         for (int i = 0; i < vertCount; i++) {
             TPPLPoint &pt = poly->GetPoint(i);
             pt.x = coordinates[i * 2];
@@ -153,20 +163,25 @@ public:
     }
 
     static inline bool ConvexPartitionOptimal(TPPLPoly *poly, TPPLPolyList *result) {
-          TPPLPartition pp;
+        TPPLPartition pp;
 
         return pp.ConvexPartition_OPT(poly, result) != 0;
+    }
 
+ static inline bool TriangulateOptimal(TPPLPoly *poly, TPPLPolyList *result) {
+        TPPLPartition pp;
+
+        return pp.Triangulate_OPT(poly, result) != 0;
     }
 
 
     static inline bool PolyList_RemoveHoles(TPPLPolyList *polys, TPPLPolyList *result) {
-          TPPLPartition pp;
+        TPPLPartition pp;
         return pp.RemoveHoles(polys, result) != 0;
     }
 
     static inline bool PolyList_ConvexPartition(TPPLPolyList *polys, TPPLPolyList *result) {
-          TPPLPartition pp;
+        TPPLPartition pp;
 
         return pp.ConvexPartition_HM(polys, result) != 0;
     }
@@ -184,20 +199,14 @@ public:
         return &p;
     }
 
-
-
     static inline int NumPolys(TPPLPolyList *list) {
         return list->size();
     }
 
-
     static inline PartitionPolyIt *GetPolyIt(TPPLPolyList *list) {
-        auto *x = new PartitionPolyIt (list);
+        auto *x = new PartitionPolyIt(list);
         return x;
     }
-
-
 };
-
 
 #endif

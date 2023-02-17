@@ -13,11 +13,12 @@ class Generator {
 
 #include \"hl-clip.h\"
 #include \"polypartition.h\"
-
+using namespace Clipper2Lib;
 ";
 static var JVM_INCLUDE ="
 #include \"hl-clip.h\"
 #include \"polypartition.h\"
+using namespace Clipper2Lib;
 ";
 
 	static var options = {
