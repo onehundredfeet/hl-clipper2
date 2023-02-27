@@ -1,6 +1,7 @@
 #!/bin/sh
 ARCH=x86_64
 #ARCH=arm64
+PROJECT=clip
 BUILDER="ninja"
 TARGET=hl
 #TARGET=jvm
@@ -17,7 +18,11 @@ do
 done
 
 
+
 pushd build/${TARGET}/${ARCH}/${CONFIG}
-${BUILDER}
+${BUILDER} install
 popd
+mkdir -p bin
+rm -f ${PROJECT}.dylib
+cp -f build/${TARGET}/${ARCH}/${CONFIG}/${PROJECT}.* .
 
