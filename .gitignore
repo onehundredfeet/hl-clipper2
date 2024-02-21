@@ -4,3 +4,4 @@ bin
 src/clipper2.cpp
 src/hl-idl-helpers.hpp
 clip.hdll
+.haxelib
